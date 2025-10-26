@@ -84,6 +84,17 @@ def main() -> None:
         # Generate README markdown
         logger.info("Generating README markdown...")
         generator = ReadmeGenerator(include_commit_examples=True)
+
+        # code_docs = generator.analyze_code(args.token, args.user, args.repo)
+
+        # Generate README with code documentation
+        # md = generator.generate_markdown(
+        #     meta=meta,
+        #     summaries=summaries,
+        #     commits=commits,
+        #     code_docs=code_docs
+        # )
+
         md = generator.generate_markdown(meta, summaries, commits)
 
         # Write output file

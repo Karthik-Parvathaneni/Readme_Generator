@@ -8,6 +8,7 @@ from .generator import ReadmeGenerator
 from .summarizer import CommitSummarizer
 from .parser import CommitParser, CommitCategorizer
 from .main import main
+from .code_analyzer import CodeAnalyzer
 
 __all__ = [
     'CommitInfo', 
@@ -17,5 +18,6 @@ __all__ = [
     'CommitSummarizer',
     'CommitParser',
     'CommitCategorizer',
-    'main'
+    'main',
+    'CodeAnalyzer'
 ]

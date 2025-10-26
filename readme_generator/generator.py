@@ -6,9 +6,10 @@ comprehensive README markdown files from repository metadata and commit summarie
 """
 
 import datetime
-from typing import Dict, List
+from typing import Optional, Dict, List
 
 from .models import CommitInfo, RepoMeta
+from .code_analyzer import CodeAnalyzer
 
 
 class ReadmeGenerator:
@@ -30,7 +31,9 @@ class ReadmeGenerator:
         """
         self.include_commit_examples = include_commit_examples
 
-    def generate_markdown(self, meta: RepoMeta, summaries: Dict[str, str], commits: List[CommitInfo]) -> str:
+    def generate_markdown(self, meta: RepoMeta, summaries: Dict[str, str], 
+                        commits: List[CommitInfo], 
+                        code_docs: Optional[Dict[str, List[str]]] = None) -> str:
         """
         Build a markdown-formatted README string.
         
@@ -38,6 +41,7 @@ class ReadmeGenerator:
             meta: Repository metadata including name, description, URL, license
             summaries: Dictionary mapping commit types to their summaries
             commits: List of commit information for recent activity
+            code_docs: Optional dictionary containing code documentation from analyzer
             
         Returns:
             Complete README markdown content as a string
@@ -89,12 +93,12 @@ class ReadmeGenerator:
             lines.append(docs + "\n")
 
         # Installation (try to infer)
-        lines.append("## Installation\n")
-        lines.append("```bash")
-        lines.append("# Example: replace with repository specific instructions")
-        lines.append("pip install -r requirements.txt")
-        lines.append("```")
-        lines.append("")
+        # lines.append("## Installation\n")
+        # lines.append("```bash")
+        # lines.append("# Example: replace with repository specific instructions")
+        # lines.append("pip install -r requirements.txt")
+        # lines.append("```")
+        # lines.append("")
 
         # Project Insights (new section)
         lines.append("## Project Analysis\n")
@@ -123,6 +127,32 @@ class ReadmeGenerator:
         lines.append("## Recent activity (derived from commits)\n")
         recent_activity = self._format_recent_activity(commits)
         lines.append(recent_activity + "\n")
+
+        # Add code documentation section if available
+        if code_docs:
+            lines.append("\n## Code Documentation\n")
+            
+            if code_docs.get('modules'):
+                lines.append("### Module Overview\n")
+                for doc in code_docs['modules'][:5]:  # Show top 5 modules
+                    lines.append(f"- {doc}\n")
+                    
+            if code_docs.get('classes'):
+                lines.append("\n### Key Classes\n")
+                for doc in code_docs['classes'][:5]:  # Show top 5 classes
+                    lines.append(f"- {doc}\n")
+                    
+            if code_docs.get('functions'):
+                lines.append("\n### Important Functions\n")
+                for doc in code_docs['functions'][:5]:  # Show top 5 functions
+                    lines.append(f"- {doc}\n")
+                    
+            if code_docs.get('important_comments'):
+                lines.append("\n### Development Notes\n")
+                for comment in code_docs['important_comments'][:5]:  # Show top 5 notes
+                    lines.append(f"- {comment}\n")
+            
+            lines.append("")
 
         # License and footer
         if meta.license_name:
@@ -270,3 +300,13 @@ class ReadmeGenerator:
             lines.append(f"- `{c.sha[:7]}` {date} — {short_msg} ({author})")
         
         return "\n".join(lines)
+
+    @staticmethod
+    def analyze_code(github_token: str, repo_owner: str, repo_name: str) -> Dict[str, List[str]]:
+        """Helper method to analyze code using CodeAnalyzer"""
+        analyzer = CodeAnalyzer(
+            github_token=github_token,
+            repo_owner=repo_owner,
+            repo_name=repo_name
+        )
+        return analyzer.analyze_repository()
