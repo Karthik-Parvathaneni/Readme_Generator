@@ -1,0 +1,344 @@
+/* Improved typography, large headings, gradient accents, side-heading and better card visuals */
+
+:root {
+    --bg: #0b0f17;
+    --panel: #0f1724;
+    --card: #10151f;
+    --accent: #6ee7b7;
+    --accent-2: #34d399;
+    --muted: #9aa0a6;
+    --glass: rgba(255,255,255,0.04);
+    --radius: 12px;
+    --max-width: 1100px;
+}
+
+* { box-sizing: border-box; }
+
+/* Page */
+body {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, #06070a 0%, var(--bg) 100%);
+    color: #e8eef1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
+}
+
+/* Nav */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 48px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    backdrop-filter: blur(6px);
+}
+
+.logo {
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--accent);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+/* Nav links */
+.links a {
+    color: var(--muted);
+    text-decoration: none;
+    margin: 0 12px;
+    font-size: 0.95rem;
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+.links a:hover { color: var(--accent-2); background: rgba(110,231,183,0.04); }
+
+.links a.active { color: var(--accent); background: rgba(110,231,183,0.06); }
+
+/* Layout */
+main {
+    margin: 80px auto;
+    max-width: var(--max-width);
+    padding: 40px 20px;
+}
+
+/* Hero / Title */
+.hero {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 28px;
+}
+
+.hero-title {
+    font-size: clamp(2.1rem, 4.4vw, 3.4rem);
+    line-height: 1.03;
+    margin: 6px 0 10px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, #a7f3d0 0%, #6ee7b7 30%, #34d399 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 6px 30px rgba(16, 23, 36, 0.6);
+}
+
+.hero-sub {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 900px;
+    margin-bottom: 18px;
+}
+
+/* Input area */
+.input-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+input[type=text] {
+    width: 420px;
+    max-width: 86%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.04);
+    outline: none;
+    background-color: var(--panel);
+    color: #eef6f5;
+    font-size: 1rem;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+input[type=text]:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(110,231,183,0.06);
+    border-color: rgba(110,231,183,0.16);
+}
+
+button {
+    padding: 12px 20px;
+    background: linear-gradient(180deg, var(--accent) 0%, var(--accent-2) 100%);
+    color: #022;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    box-shadow: 0 8px 30px rgba(52,211,153,0.12);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+button:hover { transform: translateY(-3px); box-shadow: 0 18px 50px rgba(52,211,153,0.12); }
+
+/* Output area */
+.output { margin-top: 26px; font-size: 1.05rem; color: var(--accent); font-weight: 600; }
+
+/* About page */
+.about-page {
+    position: relative;
+    padding: 40px 6%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 36px;
+    align-items: start;
+}
+
+/* Decorative vertical side heading (visible on large screens) */
+.side-heading {
+    display: none;
+}
+
+@media (min-width: 900px) {
+    .about-page { grid-template-columns: 120px 1fr; padding-left: 28px; }
+    .side-heading {
+        display: block;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        font-weight: 800;
+        color: rgba(110,231,183,0.18);
+        letter-spacing: 4px;
+        font-size: 0.95rem;
+        align-self: start;
+        padding-top: 14px;
+    }
+}
+
+/* Project section */
+.about-project {
+    max-width: 900px;
+    padding: 12px 6px;
+}
+
+.about-project h1 {
+    font-size: clamp(1.6rem, 3.6vw, 2.4rem);
+    color: #e7fff8;
+    margin-bottom: 12px;
+    font-weight: 800;
+    text-shadow: 0 6px 30px rgba(2,6,23,0.5);
+}
+
+.about-project p {
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+/* Team */
+.about-team h2 {
+    font-size: clamp(1.3rem, 3vw, 1.9rem);
+    color: var(--accent);
+    margin-bottom: 20px;
+    font-weight: 800;
+}
+
+.team-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 26px;
+    justify-items: center;
+    margin-top: 10px;
+}
+
+.team-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.03);
+    border-radius: var(--radius);
+    padding: 28px 20px;
+    width: 100%;
+    max-width: 340px;
+    text-align: center;
+    transition: transform 0.28s cubic-bezier(.2,.9,.3,1), box-shadow 0.28s ease;
+    box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+}
+
+.team-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(16,23,36,0.7); }
+
+.team-card img {
+    width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
+    margin-bottom: 14px; border: 2px solid rgba(110,231,183,0.14);
+}
+
+.team-card h3 { margin: 6px 0 8px; font-size: 1.1rem; color: #fff; font-weight: 700; }
+
+.team-card .tagline { color: var(--muted); font-style: italic; font-size: 0.95rem; }
+
+/* Preview & TOC styles (added) */
+.preview-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-top: 8px;
+}
+
+/* Table of contents / subheadings */
+.toc {
+    width: 220px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.03);
+    padding: 16px;
+    border-radius: 12px;
+    color: var(--muted);
+    max-height: 480px;
+    overflow: auto;
+    flex-shrink: 0;
+}
+
+/* TOC link levels visual weight */
+.toc .toc-link { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
+.toc .toc-link:hover { color: var(--accent); }
+.toc .level-3 { margin-left: 10px; font-size: 0.9rem; color: rgba(154,160,166,0.9); }
+
+/* Markdown preview area */
+.md-preview {
+    flex: 1;
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 22px;
+    border: 1px solid rgba(255,255,255,0.03);
+    color: #e8f6f0;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+    max-height: 520px;
+    overflow: auto;
+}
+
+/* Rendered markdown elements */
+.md-preview h1,
+.md-preview h2,
+.md-preview h3 {
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-weight: 800;
+}
+
+/* Make H2/H3 pop */
+.md-preview h2 {
+    font-size: 1.4rem;
+    background: linear-gradient(90deg,#a7f3d0 0%,#6ee7b7 30%,#34d399 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 6px 24px rgba(16,23,36,0.55);
+}
+
+.md-preview h3 {
+    font-size: 1.05rem;
+    color: #eafff6;
+}
+
+/* Paragraphs and lists */
+.md-preview p { color: var(--muted); line-height: 1.7; }
+.md-preview ul, .md-preview ol { color: var(--muted); margin-left: 18px; }
+
+/* Code blocks */
+.md-preview pre {
+    background: #071018;
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 12px;
+    border-radius: 10px;
+    overflow: auto;
+    color: #cfeee9;
+}
+.md-preview code {
+    background: rgba(255,255,255,0.02);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+}
+
+/* Blockquotes */
+.md-preview blockquote {
+    border-left: 3px solid rgba(110,231,183,0.14);
+    padding-left: 12px;
+    color: #bfead9;
+    background: rgba(110,231,183,0.02);
+    margin: 12px 0;
+}
+
+/* Responsive: hide TOC on small screens and stack preview */
+@media (max-width: 860px) {
+    .preview-container { flex-direction: column; }
+    .toc { display: none; }
+    .md-preview { max-height: 420px; }
+}
+
+/* Smaller utilities */
+@media (max-width: 640px) {
+    .navbar { padding: 14px 18px; }
+    .logo { font-size: 1.05rem; }
+    .hero-title { font-size: 1.9rem; }
+    .about-page { padding: 30px 18px; grid-template-columns: 1fr; }
+    .side-heading { display: none; }
+}

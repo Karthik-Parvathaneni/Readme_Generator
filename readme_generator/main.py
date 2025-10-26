@@ -22,10 +22,8 @@ from .summarizer import CommitSummarizer
 try:
     import nltk
 except Exception:
-    # We'll raise a helpful error later; user can pip install nltk and run nltk.download('punkt','stopwords')
     nltk = None
 
-# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("readme-generator")
 

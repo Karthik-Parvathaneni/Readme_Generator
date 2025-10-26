@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReadMeMore</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">ReadMeMore</div>
+        <div class="links">
+            <a href="#">Examples</a>
+            <a href="/about">About</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1 class="hero-title">Generate AI‑Powered Smart README Files Instantly</h1>
+            <p class="hero-sub">Paste a GitHub repo (owner/repo or full URL) and get a polished README generated from commit history and inferred project details.</p>
+
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="owner/repo or https://github.com/owner/repo" />
+                <!-- Optional token: paste a personal access token to avoid rate limits -->
+                <input type="text" id="tokenInput" placeholder="Optional: GITHUB_TOKEN (keeps you from hitting rate limits)" style="width:320px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:#0f1724;color:#e8e8e8;" />
+                <button id="runBtn">Generate README</button>
+            </div>
+        </section>
+
+        <div id="output" class="output" style="margin-top:20px;">
+            <div id="status"></div>
+
+            <!-- changed: preview + TOC instead of raw textarea -->
+            <div class="preview-container" style="display:none;" id="previewContainer">
+                <aside class="toc" id="toc" aria-label="Table of contents"></aside>
+                <div id="mdPreview" class="md-preview" role="article"></div>
+            </div>
+
+            <div class="output-controls" style="margin-top:12px;">
+                <button id="rawBtn" style="display:none;margin-right:8px;">Toggle raw</button>
+                <button id="downloadBtn" style="display:none;">Download README.md</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- marked.js for client-side markdown -> HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        // ...existing helper functions...
+        function downloadText(filename, text) {
+            const el = document.createElement('a');
+            const blob = new Blob([text], { type: 'text/plain' });
+            el.href = URL.createObjectURL(blob);
+            el.download = filename;
+            document.body.appendChild(el);
+            el.click();
+            el.remove();
+        }
+
+        // utility: slugify heading text to create ids
+        function slugify(text) {
+            return text.toString().toLowerCase().trim()
+                .replace(/[^\w\s-]/g, '')
+                .replace(/\s+/g, '-');
+        }
+
+        document.getElementById('runBtn').addEventListener('click', async () => {
+            const input = document.getElementById('userInput').value;
+            const token = document.getElementById('tokenInput') ? document.getElementById('tokenInput').value.trim() : '';
+            const status = document.getElementById('status');
+            const previewContainer = document.getElementById('previewContainer');
+            const mdPreview = document.getElementById('mdPreview');
+            const toc = document.getElementById('toc');
+            const rawBtn = document.getElementById('rawBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            status.innerText = "Processing...";
+            previewContainer.style.display = "none";
+            rawBtn.style.display = "none";
+            downloadBtn.style.display = "none";
+            mdPreview.innerHTML = "";
+            toc.innerHTML = "";
+
+            const response = await fetch('/run', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_input: input, token: token })
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                // display server-provided error message (rate-limit guidance will be returned with 429)
+                status.innerText = data.error || `Generation failed (status ${response.status})`;
+                return;
+            }
+            if (response.ok && data.output) {
+                status.innerText = "Generated README:";
+                const md = data.output;
+
+                // Render markdown to HTML
+                const rendered = marked.parse(md, { mangle: false, headerIds: false });
+
+                // Insert into preview and attach anchors for headings
+                // We will parse headings from raw markdown to build TOC with proper ids
+                const headingRegex = /^(#{1,6})\s*(.+)$/gm;
+                const headings = [];
+                let match;
+                // Find headings line-by-line
+                while ((match = headingRegex.exec(md)) !== null) {
+                    const level = match[1].length;
+                    const text = match[2].trim();
+                    if (level >= 2) { // include H2+ as subheadings
+                        const id = slugify(text);
+                        headings.push({ level, text, id });
+                    }
+                }
+
+                // Transform rendered HTML: add ids to headings so TOC links work
+                // Create a temporary container to manipulate DOM nodes safely
+                const tmp = document.createElement('div');
+                tmp.innerHTML = rendered;
+                headings.forEach(h => {
+                    // Find first heading element matching the text (H2/H3...)
+                    const selector = 'h' + h.level;
+                    const el = Array.from(tmp.querySelectorAll(selector)).find(e => e.textContent.trim() === h.text);
+                    if (el) el.id = h.id;
+                });
+
+                mdPreview.innerHTML = tmp.innerHTML;
+                // Build TOC
+                if (headings.length > 0) {
+                    toc.style.display = 'block';
+                    toc.innerHTML = '<strong style="display:block;margin-bottom:8px;color:var(--accent);">Sections</strong>';
+                    headings.forEach(h => {
+                        const a = document.createElement('a');
+                        a.href = '#' + h.id;
+                        a.textContent = h.text;
+                        a.className = 'toc-link level-' + h.level;
+                        a.style.display = 'block';
+                        a.style.marginBottom = '6px';
+                        a.onclick = (ev) => {
+                            ev.preventDefault();
+                            const target = document.getElementById(h.id);
+                            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        };
+                        toc.appendChild(a);
+                    });
+                } else {
+                    toc.style.display = 'none';
+                }
+
+                // Show preview and controls
+                previewContainer.style.display = 'flex';
+                rawBtn.style.display = 'inline-block';
+                downloadBtn.style.display = 'inline-block';
+                downloadBtn.onclick = () => downloadText('README_GENERATED.md', md);
+
+                // raw toggle behavior
+                let showingRaw = false;
+                rawBtn.onclick = () => {
+                    showingRaw = !showingRaw;
+                    if (showingRaw) {
+                        mdPreview.textContent = md;
+                        rawBtn.textContent = 'Show rendered';
+                        mdPreview.style.whiteSpace = 'pre-wrap';
+                    } else {
+                        mdPreview.innerHTML = tmp.innerHTML;
+                        rawBtn.textContent = 'Show raw';
+                        mdPreview.style.whiteSpace = 'normal';
+                    }
+                };
+
+            } else {
+                status.innerText = data.error || 'Generation failed';
+            }
+        });
+    </script>
+</body>
+</html>
