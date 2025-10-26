@@ -90,7 +90,7 @@ class GitHubFetcher:
             logger.error(error_msg)
             raise RuntimeError(error_msg) from e
 
-    def fetch_commits(self, owner: str, repo_name: str, max_commits: int = 500) -> List[CommitInfo]:
+    def fetch_commits(self, owner: str, repo_name: str, max_commits: int = 1000) -> List[CommitInfo]:
         """
         Fetch commit history from GitHub repository.
         
@@ -99,7 +99,7 @@ class GitHubFetcher:
         Args:
             owner: Repository owner username
             repo_name: Repository name
-            max_commits: Maximum number of commits to fetch (default: 500)
+            max_commits: Maximum number of commits to fetch (default: 1000)
             
         Returns:
             List of CommitInfo objects representing the commit history
