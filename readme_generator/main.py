@@ -43,7 +43,7 @@ def main() -> None:
     parser.add_argument("--repo", "-r", required=True, help="Repository name")
     parser.add_argument("--token", "-t", required=False, help="GitHub token (recommended to avoid rate limits)")
     parser.add_argument("--output", "-o", default="README_GENERATED.md", help="Output README filename")
-    parser.add_argument("--max-commits", type=int, default=500, help="Maximum number of commits to fetch")
+    parser.add_argument("--max-commits", type=int, default=1000, help="Maximum number of commits to fetch")
     parser.add_argument("--use-gemini", action="store_true", help="Use Gemini API for abstractive summarization (placeholder)")
     args = parser.parse_args()
 
